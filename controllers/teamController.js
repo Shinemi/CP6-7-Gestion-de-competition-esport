@@ -40,4 +40,44 @@ const createTeam = async (req, res) => {
     }
 }
 
-module.exports = { createTeam }
+//@desc US6 = join an existing team
+//@route POST /api/v1/team/:teamId/join
+//@access Private
+
+const joinTeam = async (req, res) => {
+    try {
+        const { teamId } = req.params
+
+        const team = await Team.findById(teamId)
+        if (!team) {
+            return res.status(404).json({ message: 'team not found' })
+        }
+
+        const isAlreadyMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+
+        if (isAlreadyMember) {
+            return res.status(400).json({ message: 'you are already a member of this team' })
+        }
+
+        team.members.push(req.user._id)
+        await team.save()
+
+        res.status(200).json({
+            message: 'joined team successfully',
+            team: {
+                id: team._id,
+                name: team.name,
+                game: team.game,
+                captain: team.captain,
+                members: team.members,
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while joining team', error: error.message })
+    }
+}
+
+module.exports = { createTeam, joinTeam }
