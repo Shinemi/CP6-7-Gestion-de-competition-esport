@@ -31,7 +31,7 @@ const teamSchema = new mongoose.Schema(
 )
 
 // s'assure que le capitaine fait toujours partie des membres
-teamSchema.pre('save', function (next) {
+teamSchema.pre('save', function () {
     const captainId = this.captain.toString()
     const isCaptainInMembers = this.members.some(
         (memberId) => memberId.toString() === captainId
@@ -41,7 +41,6 @@ teamSchema.pre('save', function (next) {
         this.members.push(this.captain)
     }
 
-    next()
 })
 
 module.exports = mongoose.model('Team', teamSchema)
