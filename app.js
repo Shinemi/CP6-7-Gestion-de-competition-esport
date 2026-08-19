@@ -4,6 +4,7 @@ const port = 3000
 require('dotenv').config()
 require('./config/db')
 
+app.use(express.json())
 
 //import des routes
 const authRoutes = require('./routes/authRoutes')

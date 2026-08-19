@@ -18,9 +18,9 @@ const generateToken = (id) => {
 
 const register = async (req,res) =>  {
     try {
-        const {email,password,role} = req.body
+        const {name,email,password,role} = req.body
 
-        if(!email || !password){
+        if(!name || !email || !password){
             return res.status(400).json({message: 'please provide all the informations'})
         }
 
@@ -50,6 +50,7 @@ const register = async (req,res) =>  {
 
         //create new user
         const user = await User.create({
+            name,
             email,
             password,
             role: role || 'user',
@@ -62,6 +63,7 @@ const register = async (req,res) =>  {
             token,
             user:{
                 id: user._id,
+                name: user.name,
                 email : user.email,
                 role : user.role,
             }
@@ -107,6 +109,7 @@ const login = async (req,res) =>{
             token,
             user:{
                 id: user._id,
+                name: user.name,
                 email : user.email,
                 role : user.role,
             }
