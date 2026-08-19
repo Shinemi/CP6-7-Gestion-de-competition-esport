@@ -12,7 +12,7 @@ const generateToken = (id) => {
     })
 }
 
-//@desc Register a new user
+//@desc US1 = Register a new user
 //@route POST /api/v1/auth/register
 //@access Public
 
@@ -73,7 +73,7 @@ const register = async (req,res) =>  {
 }
 
 
-//@desc login user and get token
+//@desc US2 = login user and get token
 //@route POST /api/v1/auth/login
 //@access Public
 
