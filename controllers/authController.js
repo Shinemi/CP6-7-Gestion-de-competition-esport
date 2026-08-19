@@ -122,7 +122,7 @@ const login = async (req,res) =>{
 }
 
 //@desc US4 = update my profile (connected user)
-//@route PUT /api/v1/auth/profile
+//@route PATCH /api/v1/auth/profile
 //@access Private
 
 const updateProfile = async (req, res) => {
@@ -152,7 +152,7 @@ const updateProfile = async (req, res) => {
                 return res.status(400).json({ message: 'le mdp doit contenir... (tout le tralala)' })
             }
 
-            user.password = password 
+            user.password = password // sera hashé automatiquement par le hook pre('save')
         }
 
         // note : email et role ne sont pas modifiables ici
