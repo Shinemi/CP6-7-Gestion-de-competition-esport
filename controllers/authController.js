@@ -121,4 +121,57 @@ const login = async (req,res) =>{
     }
 }
 
-module.exports = {register, login}
+//@desc US4 = update my profile (connected user)
+//@route PUT /api/v1/auth/profile
+//@access Private
+
+const updateProfile = async (req, res) => {
+    try {
+        const { name, password } = req.body
+        // utilisateur déjà authentifié (middleware)
+        const user = await User.findById(req.user._id)
+
+        if (!user) {
+            return res.status(404).json({ message: 'user not found' })
+        }
+
+        if (name) {
+            user.name = name
+        }
+
+        if (password) {
+            const isPasswordOK = validator.isStrongPassword(password, {
+                minLength: 6,
+                minLowercase: 1,
+                minUppercase: 1,
+                minNumbers: 1,
+                minSymbols: 1
+            })
+
+            if (!isPasswordOK) {
+                return res.status(400).json({ message: 'le mdp doit contenir... (tout le tralala)' })
+            }
+
+            user.password = password 
+        }
+
+        // note : email et role ne sont pas modifiables ici
+
+        await user.save()
+
+        res.status(200).json({
+            message: 'profile updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error during profile update', error: error.message })
+    }
+}
+
+module.exports = {register, login, updateProfile}

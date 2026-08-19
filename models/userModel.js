@@ -18,12 +18,12 @@ const userSchema = new mongoose.Schema(
         password:{
             type : String,
             required : [true, 'Password is required'],
-            minlenght : 6,
+            minlength : 6,
             select : false, //dont return password by default
         },
         role:{
             type : String,
-            enum : ['user', 'admin'],
+            enum : ['user','organisateur','admin'],
             default : 'user',
         },
 
