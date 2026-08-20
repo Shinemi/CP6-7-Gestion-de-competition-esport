@@ -8,7 +8,7 @@ const teamSchema = new mongoose.Schema(
             trim: true,
             unique: true,
         },
-        game: {
+        game: { // voir pour modifier en tableau (une équipe peut avoir plusieurs jeux)
             type: String,
             required: [true, 'Game is required'],
             trim: true,

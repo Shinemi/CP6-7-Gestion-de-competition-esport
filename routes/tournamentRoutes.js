@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const {  } = require('../controllers/tournamentController')
+const { createTournament } = require('../controllers/tournamentController')
 const authMiddleware = require('../middlewares/authMiddleware')
 
-router.post('/',)
-
+router.post('/createTournament', authMiddleware, createTournament)
 
 module.exports = router
