@@ -1,4 +1,5 @@
 const Tournament = require('../models/tournamentModel')
+const Team = require('../models/teamModel')
 
 //@desc US8 = create a new tournament (organisateur or admin only)
 //@route POST /api/v1/tournament
@@ -120,4 +121,67 @@ const deleteTournament = async (req, res) => {
     }
 }
 
-module.exports = { createTournament, updateTournament, deleteTournament }
+//@desc US11 = register my team to a tournament (any team member)
+//@route POST /api/v1/tournament/:tournamentId/register
+//@access Private
+
+const registerTeam = async (req, res) => {
+    try {
+        const { tournamentId } = req.params
+        const { teamId } = req.body
+
+        if (!teamId) {
+            return res.status(400).json({ message: 'please provide a teamId' })
+        }
+
+        const tournament = await Tournament.findById(tournamentId)
+        if (!tournament) {
+            return res.status(404).json({ message: 'tournament not found' })
+        }
+
+        if (tournament.status !== 'open') {
+            return res.status(400).json({ message: 'this tournament is not open for registration' })
+        }
+
+        const team = await Team.findById(teamId)
+        if (!team) {
+            return res.status(404).json({ message: 'team not found' })
+        }
+
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+
+        if (!isMember) {
+            return res.status(403).json({ message: 'you must be a member of this team to register it' })
+        }
+
+        const isAlreadyRegistered = tournament.registeredTeams.some(
+            (id) => id.toString() === team._id.toString()
+        )
+
+        if (isAlreadyRegistered) {
+            return res.status(400).json({ message: 'this team is already registered to this tournament' })
+        }
+
+        tournament.registeredTeams.push(team._id)
+        team.tournaments.push(tournament._id)
+
+        await tournament.save()
+        await team.save()
+
+        res.status(200).json({
+            message: 'team registered to tournament successfully',
+            tournament: {
+                id: tournament._id,
+                name: tournament.name,
+                registeredTeams: tournament.registeredTeams,
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error during team registration', error: error.message })
+    }
+}
+
+module.exports = { createTournament, updateTournament, deleteTournament, registerTeam }
