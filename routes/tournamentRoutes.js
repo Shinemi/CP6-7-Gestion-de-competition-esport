@@ -4,7 +4,7 @@ const { createTournament, updateTournament, deleteTournament } = require('../con
 const authMiddleware = require('../middlewares/authMiddleware')
 
 router.post('/createTournament', authMiddleware, createTournament)
-router.put('/:tournamentId/updateTournament', authMiddleware, updateTournament)
+router.patch('/:tournamentId/updateTournament', authMiddleware, updateTournament)
 router.delete('/:tournamentId/deleteTournament', authMiddleware, deleteTournament)
 
 module.exports = router

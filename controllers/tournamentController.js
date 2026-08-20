@@ -43,7 +43,7 @@ const createTournament = async (req, res) => {
 }
 
 //@desc US9 = update a tournament I created
-//@route PUT /api/v1/tournament/:tournamentId
+//@route PATCH /api/v1/tournament/:tournamentId
 //@access Private
 
 const updateTournament = async (req, res) => {
