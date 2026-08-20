@@ -2,7 +2,7 @@ const Tournament = require('../models/tournamentModel')
 const Team = require('../models/teamModel')
 
 //@desc US8 = create a new tournament (organisateur or admin only)
-//@route POST /api/v1/tournament
+//@route POST /api/v1/tournament/createTournament
 //@access Private
 
 const createTournament = async (req, res) => {
@@ -44,7 +44,7 @@ const createTournament = async (req, res) => {
 }
 
 //@desc US9 = update a tournament I created
-//@route PATCH /api/v1/tournament/:tournamentId
+//@route PATCH /api/v1/tournament/:tournamentId/updateTournament
 //@access Private
 
 const updateTournament = async (req, res) => {
@@ -93,7 +93,7 @@ const updateTournament = async (req, res) => {
 }
 
 //@desc US10 = delete a tournament (organisateur owner or admin)
-//@route DELETE /api/v1/tournament/:tournamentId
+//@route DELETE /api/v1/tournament/:tournamentId/deleteTournament
 //@access Private
 
 const deleteTournament = async (req, res) => {
@@ -184,4 +184,23 @@ const registerTeam = async (req, res) => {
     }
 }
 
-module.exports = { createTournament, updateTournament, deleteTournament, registerTeam }
+//@desc US12 = list all tournaments open for registration
+//@route GET /api/v1/tournament/openTournaments
+//@access Private
+
+const getOpenTournaments = async (req, res) => {
+    try {
+        const tournaments = await Tournament.find({ status: 'open' })
+            .select('name game date rules organizer status')
+
+        res.status(200).json({
+            count: tournaments.length,
+            tournaments,
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while fetching open tournaments', error: error.message })
+    }
+}
+
+module.exports = { createTournament, updateTournament, deleteTournament, registerTeam, getOpenTournaments }
