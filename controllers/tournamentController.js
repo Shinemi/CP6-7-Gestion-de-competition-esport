@@ -185,7 +185,7 @@ const registerTeam = async (req, res) => {
 }
 
 //@desc US12 = list all tournaments open for registration
-//@route GET /api/v1/tournament/openTournaments
+//@route GET /api/v1/tournament/open
 //@access Private
 
 const getOpenTournaments = async (req, res) => {
@@ -203,4 +203,33 @@ const getOpenTournaments = async (req, res) => {
     }
 }
 
-module.exports = { createTournament, updateTournament, deleteTournament, registerTeam, getOpenTournaments }
+//@desc US13 = view teams registered to a tournament I organize
+//@route GET /api/v1/tournament/:tournamentId/teams
+//@access Private
+
+const getRegisteredTeams = async (req, res) => {
+    try {
+        const { tournamentId } = req.params
+
+        const tournament = await Tournament.findById(tournamentId)
+            .populate('registeredTeams', 'name game captain members')
+
+        if (!tournament) {
+            return res.status(404).json({ message: 'tournament not found' })
+        }
+
+        if (tournament.organizer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'only the organizer of this tournament can view registered teams' })
+        }
+
+        res.status(200).json({
+            count: tournament.registeredTeams.length,
+            teams: tournament.registeredTeams,
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while fetching registered teams', error: error.message })
+    }
+}
+
+module.exports = { createTournament, updateTournament, deleteTournament, registerTeam, getOpenTournaments, getRegisteredTeams }
