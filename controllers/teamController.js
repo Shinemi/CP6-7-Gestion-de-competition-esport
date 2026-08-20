@@ -188,4 +188,36 @@ const removeMember = async (req, res) => {
     }
 }
  
-module.exports = { createTeam, joinTeam, addMember, removeMember }
+//@desc US14 = delete a team (admin only)
+//@route DELETE /api/v1/team/:teamId/deleteTeam
+//@access Private
+
+const deleteTeam = async (req, res) => {
+    try {
+        const { teamId } = req.params
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'only an admin can delete a team' })
+        }
+
+        const team = await Team.findById(teamId)
+        if (!team) {
+            return res.status(404).json({ message: 'team not found' })
+        }
+
+        //nettoyer les references de cette equipe dans les tournois ou elle etait inscrite
+        await Tournament.updateMany(
+            { registeredTeams: team._id },
+            { $pull: { registeredTeams: team._id } }
+        )
+
+        await team.deleteOne()
+
+        res.status(200).json({ message: 'team deleted successfully' })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while deleting team', error: error.message })
+    }
+}
+
+module.exports = { createTeam, joinTeam, addMember, removeMember, deleteTeam }
