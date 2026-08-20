@@ -1,5 +1,5 @@
 const Team = require('../models/teamModel')
-
+const User = require('../models/userModel')
 //@desc US5 = create a new team (connected user becomes captain)
 //@route POST /api/v1/team
 //@access Private
