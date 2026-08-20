@@ -24,6 +24,12 @@ const teamSchema = new mongoose.Schema(
                 ref: 'User',
             }
         ],
+        tournaments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Tournament',
+            }
+        ],
     },
     {
         timestamps: true
