@@ -232,4 +232,45 @@ const getRegisteredTeams = async (req, res) => {
     }
 }
 
-module.exports = { createTournament, updateTournament, deleteTournament, registerTeam, getOpenTournaments, getRegisteredTeams }
+//@desc US15 = view participation stats (number of teams registered per tournament)
+//@route GET /api/v1/tournament/stats
+//@access Private (admin only)
+
+const getParticipationStats = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'only an admin can view participation stats' })
+        }
+
+        const stats = await Tournament.aggregate([
+            {
+                $project: {
+                    name: 1,
+                    game: 1,
+                    date: 1,
+                    status: 1,
+                    teamCount: { $size: '$registeredTeams' },
+                }
+            },
+            { $sort: { teamCount: -1 } }
+        ])
+
+        res.status(200).json({
+            count: stats.length,
+            stats,
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while fetching participation stats', error: error.message })
+    }
+}
+
+module.exports = {  
+                    createTournament, 
+                    updateTournament, 
+                    deleteTournament, 
+                    registerTeam, 
+                    getOpenTournaments, 
+                    getRegisteredTeams, 
+                    getParticipationStats 
+                }
