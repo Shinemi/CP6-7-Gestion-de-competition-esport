@@ -121,7 +121,7 @@ const login = async (req,res) =>{
 }
 
 //@desc US4 = update my profile (connected user)
-//@route PATCH /api/v1/auth/profile
+//@route PATCH /api/v1/auth/updateProfile
 //@access Private
 
 const updateProfile = async (req, res) => {

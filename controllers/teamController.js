@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 const Team = require('../models/teamModel')
 const User = require('../models/userModel')
 const Tournament = require('../models/tournamentModel')
+
 //@desc US5 = create a new team (connected user becomes captain)
-//@route POST /api/v1/team
+//@route POST /api/v1/team/createTeam
 //@access Private
 
 const createTeam = async (req, res) => {
