@@ -251,4 +251,37 @@ const getTeamDetails = async (req, res) => {
     }
 }
 
-module.exports = { createTeam, joinTeam, addMember, removeMember, deleteTeam, getTeamDetails }
+//@desc US18 = view tournaments my team is registered to
+//@route GET /api/v1/team/:teamId/teamTournaments
+//@access Private (team members only)
+
+const getMyTeamTournaments = async (req, res) => {
+    try {
+        const { teamId } = req.params
+
+        const team = await Team.findById(teamId)
+            .populate('tournaments', 'name game date rules status')
+
+        if (!team) {
+            return res.status(404).json({ message: 'team not found' })
+        }
+
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+
+        if (!isMember) {
+            return res.status(403).json({ message: 'you must be a member of this team to view its tournaments' })
+        }
+
+        res.status(200).json({
+            count: team.tournaments.length,
+            tournaments: team.tournaments,
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while fetching team tournaments', error: error.message })
+    }
+}
+
+module.exports = { createTeam, joinTeam, addMember, removeMember, deleteTeam, getTeamDetails, getMyTeamTournaments }
