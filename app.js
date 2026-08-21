@@ -26,7 +26,7 @@ app.use(
 const corsoptions = {
     origin: ['http://localhost:3000']
 }
-app.use(cors())
+app.use(cors(corsoptions))
 
 // Rate limit global
 const limiter = rateLimit({

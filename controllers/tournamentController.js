@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const Tournament = require('../models/tournamentModel')
 const Team = require('../models/teamModel')
 
@@ -50,6 +51,10 @@ const createTournament = async (req, res) => {
 const updateTournament = async (req, res) => {
     try {
         const { tournamentId } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(tournamentId)) {
+            return res.status(400).json({ message: 'invalid tournament id' })
+        }
         const { name, game, date, rules, status } = req.body
 
         const tournament = await Tournament.findById(tournamentId)
@@ -113,6 +118,10 @@ const deleteTournament = async (req, res) => {
         }
 
         await tournament.deleteOne()
+        await Team.updateMany(
+            { tournaments: tournament._id },
+            { $pull: { tournaments: tournament._id } }
+        )
 
         res.status(200).json({ message: 'tournament deleted successfully' })
 
@@ -129,6 +138,10 @@ const registerTeam = async (req, res) => {
     try {
         const { tournamentId } = req.params
         const { teamId } = req.body
+
+        if (!mongoose.Types.ObjectId.isValid(tournamentId) || !mongoose.Types.ObjectId.isValid(teamId)) {
+            return res.status(400).json({ message: 'invalid tournament or team id' })
+        }
 
         if (!teamId) {
             return res.status(400).json({ message: 'please provide a teamId' })

@@ -38,8 +38,8 @@ const register = async (req,res) =>  {
 
         //verif si cest un mail
         const isEmailOK = validator.isEmail(email)
-        if (!email){
-            return res.status(400).json({message: 'Provide valid email)'})
+        if (!isEmailOK){
+            return res.status(400).json({message: 'Provide valid email'})
 
         }
         //check if user exist
@@ -88,7 +88,7 @@ const login = async (req,res) =>{
         }
 
         //find user and explicitely select password field
-        const user = await User.findOne({email}).select('+password')
+        const user = await User.findOne({email: email.toLowerCase()}).select('+password')
 
         if(!user){
             return res.status(401).json({message: 'invalid credentials'})
@@ -103,7 +103,7 @@ const login = async (req,res) =>{
 
         const token = generateToken(user._id)
 
-        res.status(201).json({
+        res.status(200).json({
             message : 'Login succesful',
             token,
             user:{

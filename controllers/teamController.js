@@ -1,5 +1,7 @@
+const mongoose = require('mongoose')
 const Team = require('../models/teamModel')
 const User = require('../models/userModel')
+const Tournament = require('../models/tournamentModel')
 //@desc US5 = create a new team (connected user becomes captain)
 //@route POST /api/v1/team
 //@access Private
@@ -48,6 +50,10 @@ const joinTeam = async (req, res) => {
     try {
         const { teamId } = req.params
 
+        if (!mongoose.Types.ObjectId.isValid(teamId)) {
+            return res.status(400).json({ message: 'invalid team id' })
+        }
+
         const team = await Team.findById(teamId)
         if (!team) {
             return res.status(404).json({ message: 'team not found' })
@@ -88,6 +94,10 @@ const addMember = async (req, res) => {
     try {
         const { teamId } = req.params
         const { email } = req.body
+
+        if (!mongoose.Types.ObjectId.isValid(teamId)) {
+            return res.status(400).json({ message: 'invalid team id' })
+        }
  
         if (!email) {
             return res.status(400).json({ message: 'please provide an email' })
@@ -142,6 +152,10 @@ const addMember = async (req, res) => {
 const removeMember = async (req, res) => {
     try {
         const { teamId, userId } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(teamId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'invalid team or user id' })
+        }
  
         const team = await Team.findById(teamId)
         if (!team) {
@@ -196,6 +210,10 @@ const deleteTeam = async (req, res) => {
     try {
         const { teamId } = req.params
 
+        if (!mongoose.Types.ObjectId.isValid(teamId)) {
+            return res.status(400).json({ message: 'invalid team id' })
+        }
+
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: 'only an admin can delete a team' })
         }
@@ -227,6 +245,10 @@ const deleteTeam = async (req, res) => {
 const getTeamDetails = async (req, res) => {
     try {
         const { teamId } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(teamId)) {
+            return res.status(400).json({ message: 'invalid team id' })
+        }
 
         const team = await Team.findById(teamId)
             .populate('captain', 'name role')

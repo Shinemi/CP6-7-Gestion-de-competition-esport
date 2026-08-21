@@ -38,7 +38,7 @@ describe('API - Gestion de compétition esport', () => {
 
         console.log('US2:', response.status, response.data)
 
-        expect(response.status).toBe(201)
+        expect(response.status).toBe(200)
 
         expect(response.data).toHaveProperty('token')
 
@@ -83,7 +83,18 @@ describe('API - Gestion de compétition esport', () => {
 
         expect(response.status).toBe(201)
 
-        teamId = response.data.team._id
+        teamId = response.data.team.id
+    })
+
+    test('US1 - Refuser un email invalide', async () => {
+
+        const response = await api.post('/auth/register', {
+            name: 'Invalid Email User',
+            email: `invalid-${Date.now()}`,
+            password: 'Test1234!'
+        })
+
+        expect(response.status).toBe(400)
     })
 
     test('US17 - Consulter le détail d’une équipe', async () => {
@@ -100,6 +111,20 @@ describe('API - Gestion de compétition esport', () => {
         console.log('US17:', response.status, response.data)
 
         expect(response.status).toBe(200)
+    })
+
+    test('Team API - Refuser un identifiant invalide', async () => {
+
+        const response = await api.get(
+            '/team/not-an-object-id/teamDetails',
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+
+        expect(response.status).toBe(400)
     })
 
     test('US6 - Rejoindre une équipe', async () => {
