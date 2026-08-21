@@ -14,7 +14,7 @@ const {
 const authMiddleware = require('../middlewares/authMiddleware')
 
 router.get('/open', authMiddleware, getOpenTournaments)
-router.post('/stats', authMiddleware, getParticipationStats)
+router.get('/stats', authMiddleware, getParticipationStats)
 router.post('/createTournament', authMiddleware, createTournament)
 router.get('/:tournamentId/teams', authMiddleware, getRegisteredTeams)
 router.patch('/:tournamentId/updateTournament', authMiddleware, updateTournament)
