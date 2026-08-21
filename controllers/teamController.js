@@ -220,4 +220,35 @@ const deleteTeam = async (req, res) => {
     }
 }
 
-module.exports = { createTeam, joinTeam, addMember, removeMember, deleteTeam }
+//@desc US17 = view a team's composition and info (any connected user)
+//@route GET /api/v1/team/:teamId/teamDetails
+//@access Private
+
+const getTeamDetails = async (req, res) => {
+    try {
+        const { teamId } = req.params
+
+        const team = await Team.findById(teamId)
+            .populate('captain', 'name role')
+            .populate('members', 'name role')
+
+        if (!team) {
+            return res.status(404).json({ message: 'team not found' })
+        }
+
+        res.status(200).json({
+            team: {
+                id: team._id,
+                name: team.name,
+                game: team.game,
+                captain: team.captain,
+                members: team.members,
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while fetching team details', error: error.message })
+    }
+}
+
+module.exports = { createTeam, joinTeam, addMember, removeMember, deleteTeam, getTeamDetails }
