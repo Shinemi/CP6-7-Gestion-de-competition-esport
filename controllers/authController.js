@@ -18,7 +18,7 @@ const generateToken = (id) => {
 
 const register = async (req,res) =>  {
     try {
-        const {name,email,password,role} = req.body
+        const {name,email,password} = req.body //pas de role, grosse faille de sécurité
 
         if(!name || !email || !password){
             return res.status(400).json({message: 'please provide all the informations'})
@@ -174,4 +174,49 @@ const updateProfile = async (req, res) => {
     }
 }
 
-module.exports = {register, login, updateProfile}
+//@desc US16 = update a user's role (admin only)
+//@route PUT /api/v1/auth/users/:userId/role
+//@access Private (admin only)
+
+const updateUserRole = async (req, res) => {
+    try {
+        const { userId } = req.params
+        const { role } = req.body
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'only an admin can manage user roles' })
+        }
+
+        if (!role) {
+            return res.status(400).json({ message: 'please provide a role' })
+        }
+
+        const allowedRoles = ['user', 'organisateur', 'admin']
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).json({ message: `role must be one of : ${allowedRoles.join(', ')}` })
+        }
+
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: 'user not found' })
+        }
+
+        user.role = role
+        await user.save()
+
+        res.status(200).json({
+            message: 'user role updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'server error while updating user role', error: error.message })
+    }
+}
+
+module.exports = {register, login, updateProfile, updateUserRole}
